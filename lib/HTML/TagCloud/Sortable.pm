@@ -13,7 +13,7 @@ HTML::TagCloud::Sortable - A sortable HTML tag cloud
 
 =head1 SYNOPSIS
 
-    my $could = HTML::TagCould::Sortable->new;
+    my $cloud = HTML::TagCloud::Sortable->new;
     
     # old HTML::TagCloud style
     $cloud->add( 'foo', $url, 10 );
