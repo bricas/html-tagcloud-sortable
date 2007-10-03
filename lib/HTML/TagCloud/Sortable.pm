@@ -110,6 +110,29 @@ Passing undef to sort_field will maintain insertion order.
 
 =cut
 
+my %sorts = (
+    alpha => {
+        asc => sub {
+            my $f = shift;
+            return sub { $_[ 0 ]->{ $f } cmp $_[ 1 ]->{ $f } }
+        },
+        desc => sub {
+            my $f = shift;
+            return sub { $_[ 1 ]->{ $f } cmp $_[ 0 ]->{ $f } }
+        },
+    },
+    numeric => {
+        asc => sub {
+            my $f = shift;
+            return sub { $_[ 0 ]->{ $f } <=> $_[ 1 ]->{ $f } }
+        },
+        desc => sub {
+            my $f = shift;
+            return sub { $_[ 1 ]->{ $f } <=> $_[ 0 ]->{ $f } }
+        },
+    },
+);
+
 sub tags {
     my ( $self, @args ) = @_;
 
@@ -165,21 +188,17 @@ sub tags {
     if ( my $sort = $options{ sort_field } ) {
 
         if ( !ref $sort ) {
-            my @order
-                = $options{ sort_order } eq 'desc' ? qw( b a ) : qw( a b );
-            my $op = $options{ sort_type } eq 'numeric' ? '<=>' : 'cmp';
-            my $default
-                = $options{ sort_field } ne 'name'
-                ? '|| $a->{ name } cmp $b->{ name }'
-                : '';
-            $sort = eval
-                "sub { \$$order[0]\->{ $options{sort_field} } $op \$$order[1]\->{ $options{sort_field} } $default };";
-        }
-        else {
-            my $oldsort = $sort;
-            $sort = sub { $oldsort->( $a, $b ); };
+            my $newsort = $sorts{ lc $options{ sort_type } }
+                { lc $options{ sort_order } }->( $sort );
+            $sort = $sort ne 'name'
+                ? sub {
+                $newsort->( @_ ) || $_[ 0 ]->{ name } cmp $_[ 1 ]->{ name };
+                }
+                : $newsort;
         }
 
+        my $oldsort = $sort;
+        $sort = sub { $oldsort->( $a, $b ); };
         @tags = sort $sort @tags;
     }
 
