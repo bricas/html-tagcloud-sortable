@@ -1,4 +1,8 @@
 Revision history for Perl extension HTML::TagCloud::Sortable.
 
+0.02  Thu Oct 04 2007
+    - updated tests for consistent insertion order
+    - specify minimum perl version (5.6.0)
+
 0.01  Wed Oct 03 2007
     - original version

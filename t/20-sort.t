@@ -6,7 +6,8 @@ my $cloud = HTML::TagCloud::Sortable->new;
 isa_ok($cloud, 'HTML::TagCloud::Sortable');
 
 my $tags = tags();
-foreach my $tag (keys %$tags) {
+# added sort to keys for consistent insertion order
+foreach my $tag (sort keys %$tags) {
   my $count = $tags->{$tag};
   my $url   = "/show/$tag";
   $cloud->add($tag, $url, $count);
